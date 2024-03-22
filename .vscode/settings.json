@@ -1,3 +1,4 @@
 {
-    "cmake.sourceDirectory": "/home/physonc/repos/LP50xx-STM32-Driver/src"
+    "cmake.sourceDirectory": "/home/physonc/repos/MCP4728-STM32-Driver/src",
+    "C_Cpp.intelliSenseEngine": "disabled"
 }

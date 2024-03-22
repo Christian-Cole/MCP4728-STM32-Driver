@@ -66,7 +66,7 @@ target_link_libraries(${TARGET}
         #FreeRTOS::Heap::4
         #FreeRTOS::ARM_CM4F
         #TODO your object libraries go here
-        lp50xx-i2c-driver
+        mcp4728-i2c-driver
     )
 
 # TODO if you want a linker script
