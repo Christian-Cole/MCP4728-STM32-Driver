@@ -1,4 +1,4 @@
-
+#include <stdint.h>
 #include <stm32f103xb.h>
 #include <stm32f1xx_hal.h>
 #include <stm32f1xx_hal_gpio.h>
@@ -11,6 +11,14 @@
 #define LED_PORT GPIOA
 #define LED_PIN GPIO_PIN_5  
 #define LED_PORT_CLK_ENABLE __HAL_RCC_GPIOA_CLK_ENABLE
+
+#define LDAC_PORT GPIOB
+#define LDAC_PIN GPIO_PIN_13
+#define LDAC_PORT_CLK_ENABLE __HAL_RCC_GPIOB_CLK_ENABLE
+
+#define RDY_PORT GPIOB
+#define RDY_PIN GPIO_PIN_5  
+#define RDY_PORT_CLK_ENABLE __HAL_RCC_GPIOB_CLK_ENABLE
 
 I2C_HandleTypeDef hi2c2;
 
@@ -31,6 +39,7 @@ void SysTick_Handler(void)
 
 void initGPIO()
 {
+    // on board LED
     GPIO_InitTypeDef GPIO_Config;
 
     GPIO_Config.Mode = GPIO_MODE_OUTPUT_PP;
@@ -41,6 +50,26 @@ void initGPIO()
 
     LED_PORT_CLK_ENABLE();
     HAL_GPIO_Init(LED_PORT, &GPIO_Config);
+
+    // LDAC
+    GPIO_Config.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_Config.Pull = GPIO_NOPULL;
+    GPIO_Config.Speed = GPIO_SPEED_FREQ_HIGH;
+
+    GPIO_Config.Pin = LDAC_PIN;
+
+    LDAC_PORT_CLK_ENABLE();
+    HAL_GPIO_Init(LDAC_PORT, &GPIO_Config);
+
+    // RDY
+    GPIO_Config.Mode = GPIO_MODE_INPUT;
+    GPIO_Config.Pull = GPIO_PULLUP;
+    GPIO_Config.Speed = GPIO_SPEED_FREQ_HIGH;
+
+    GPIO_Config.Pin = RDY_PIN;
+
+    RDY_PORT_CLK_ENABLE();
+    HAL_GPIO_Init(RDY_PORT, &GPIO_Config);
 }
 
 void Error_Handler(void)
@@ -90,7 +119,7 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* hi2c)
   GPIO_InitTypeDef GPIO_InitStruct = {0};
   if(hi2c->Instance==I2C2)
   {
-    __HAL_RCC_GPIOB_CLK_ENABLE();
+    // __HAL_RCC_GPIOB_CLK_ENABLE();
     /**I2C2 GPIO Configuration
     PB10     ------> I2C2_SCL
     PB11     ------> I2C2_SDA
@@ -135,31 +164,38 @@ int main(void)
     // 1kHz ticks
     HAL_SYSTICK_Config(SystemCoreClock / 1000);
 
-    int i = 0;
+    MCP4728 adc1(ADDR_A0, &hi2c2, LDAC_PORT, LDAC_PIN, RDY_PORT, RDY_PIN);
+    adc1.setLDAC(GPIO_PIN_SET);
 
-    uint8_t i2c_address = (0x14 << 1); //bit-shifted
+    adc1.fastWrite(0x0FFF, 0x0FFF, 0x0FFF, 0x0FFF);
+    adc1.setLDAC(GPIO_PIN_RESET);
+    HAL_Delay(1);
+    adc1.setLDAC(GPIO_PIN_SET);
 
-    LP50xx LEDs(i2c_address, &hi2c2);
+    uint16_t i = 0;
 
-    //reset
-    LEDs.reset();
+    uint8_t pdwn[4] {0, 0, 0, 0};
+    uint8_t ref[4] {0, 0, 0, 0};
+    uint8_t gain[4] {0, 0, 0, 0};
+    uint8_t channel[4] {0, 1, 2, 3};
+    uint8_t channelupdate[4] {0, 0, 0, 0};
+    uint16_t high[4] {0x0FFF, 0x0FFF, 0x0FFF, 0x0FFF};
+    uint16_t low[4] {0x0000, 0x0000, 0x0000, 0x0000};
 
-    //enable
-    LEDs.enable();
+    adc1.writePowerDownBits(0xFF);
 
-    LEDs.setLEDBrightness(2, 0x00);
+    HAL_Delay(50);
 
-    //LEDs.setRGBColor(0, 0xFF, 0xFF, 0xFF);
-    //LEDs.setRGBColor(1, 0xFF, 0xFF, 0xFF);
-    LEDs.setRGBColor(2, 0xFF, 0x00, 0xF0);
+    adc1.genCall_wakeUp();
 
     while (1)
     {
-        i = (i + 1) % 0xFF;
-        
-        LEDs.setLEDBrightness(2, i);
-        
-        HAL_Delay(5);
+      
+
+      //HAL_GPIO_TogglePin(LED_PORT, LED_PIN);
+
+      //HAL_Delay(1000);
+
     }
     return 0;
 }

@@ -76,9 +76,9 @@ target_link_libraries(${TARGET}
 # TODO change -mcpu=, -mfpu, -mfloat-abi, and -Map. For F4, -mfpu=vfpv4-d16 -mfloat-abi=hard are needed for FPU
 # Make gcc go brrrr
 Set(LINK_OPTIONS -mcpu=cortex-m3  --specs=nano.specs --specs=nosys.specs -Wl,-Map=${TARGET}.map,--cref -Wl,--gc-sections -Wl,--print-memory-usage -lc -lm -lnosys)
-Set(CFLAGS -mcpu=cortex-m3 -mthumb  -O2 -Wall -Wno-missing-attributes -fasm -fdata-sections -ffunction-sections -Wno-stringop-overflow -g -ggdb -mthumb-interwork)
-Set(CPPFLAGS -mcpu=cortex-m3 -mthumb -O2 -Wall -Wno-missing-attributes -fasm -fdata-sections -ffunction-sections -Wno-stringop-overflow -g -ggdb -fno-exceptions -fasm -finline -finline-functions-called-once -fshort-enums -fno-move-loop-invariants -fno-unwind-tables -fno-rtti -Wno-register -mthumb-interwork)
-Set(ASM_FLAGS -mcpu=cortex-m3 -mthumb  -O2  -Wall -fdata-sections -ffunction-sections -mthumb-interwork)
+Set(CFLAGS -mcpu=cortex-m3 -mthumb  -O0 -Wall -Wno-missing-attributes -fasm -fdata-sections -ffunction-sections -Wno-stringop-overflow -g -ggdb -mthumb-interwork)
+Set(CPPFLAGS -mcpu=cortex-m3 -mthumb -O0 -Wall -Wno-missing-attributes -fasm -fdata-sections -ffunction-sections -Wno-stringop-overflow -g -ggdb -fno-exceptions -fasm -finline -finline-functions-called-once -fshort-enums -fno-move-loop-invariants -fno-unwind-tables -fno-rtti -Wno-register -mthumb-interwork)
+Set(ASM_FLAGS -mcpu=cortex-m3 -mthumb  -O0  -Wall -fdata-sections -ffunction-sections -mthumb-interwork)
 
 target_link_options(${TARGET} INTERFACE ${LINK_OPTIONS})
 target_compile_options(${TARGET} PUBLIC

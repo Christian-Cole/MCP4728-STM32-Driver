@@ -154,7 +154,7 @@ void MCP4728::sequentialWriteEEPROM(uint8_t channelStart, uint8_t channelUpdate,
     
     uint8_t data_to_send[(2 * (4 - channelStart)) + 1];
     data_to_send[0] = SEQ_WRITE | ((channelStart & 0x03) << 1) | (channelUpdate & 0x01); 
-    for (int i = 0; i < channelStart; i++)
+    for (int i = 0; i < (4 - channelStart); i++)
     {
         data_to_send[(i * 2) + 1] = ((referenceUpdates[i] << 7) & 0x80) | ((powerDownUpdates[i] << 5) & 0x60) | ((gainUpdates[i] << 4) & 0x10) | ((outputValues[i] >> 8) & 0x0F);
         data_to_send[(i * 2) + 2] = outputValues[i] & 0xFF; 
@@ -223,7 +223,7 @@ void MCP4728::fastWrite(uint16_t outputChannel1, uint16_t outputChannel2, uint16
 
 
 
-void MCP4728::writeAddressBits() //more complicated, required LDAC change in the middle of sending, DO NOT USE RN
+void MCP4728::writeAddressBits() //more complicated, required LDAC change in the middle of sending, DO NOT USE RN, UNTESTED
 {
     uint8_t data_to_send[3];
     data_to_send[0] = ADDR_BITS_WRITE; //not done
@@ -284,7 +284,7 @@ void MCP4728::genCall_softwareUpdate()
     HAL_I2C_Master_Transmit(i2c_handle, GEN_CALL_ADDR, &data_to_send, 1, HAL_MAX_DELAY);
 }
 
-void MCP4728::genCall_readAddrBits() //USES THE LDAC PIN TO INDICATE DEV ON INTEREST, THIS DOESNT WORK RN
+void MCP4728::genCall_readAddrBits() //USES THE LDAC PIN TO INDICATE DEV ON INTEREST, THIS DOESNT WORK RN, UNTESTED
 {
     uint8_t data_to_send = GEN_CALL_RDADDR;
     HAL_I2C_Master_Transmit(i2c_handle, GEN_CALL_ADDR, &data_to_send, 1, HAL_MAX_DELAY);

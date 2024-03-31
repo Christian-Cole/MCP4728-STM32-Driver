@@ -55,18 +55,18 @@ public:
     void fastWrite(uint16_t* outputValues, uint8_t numChannelWrites);
     void fastWrite(uint16_t outputChannel1, uint16_t outputChannel2, uint16_t outputChannel3, uint16_t outputChannel4);
 
-    void writeAddressBits();
+    void writeAddressBits(); //not implemented or tested
     void writeReferenceBits(uint8_t referenceConfig);
     void writeGainBits(uint8_t gainConfig);
     void writePowerDownBits(uint8_t powerDownConfig);
     
     void setLDAC(GPIO_PinState pinState);
-    GPIO_PinState getRDYState();
+    GPIO_PinState getRDYState(); 
 
     void genCall_reset();
     void genCall_wakeUp();
     void genCall_softwareUpdate();
-    void genCall_readAddrBits();
+    void genCall_readAddrBits(); //not implemented or tested
 
 private:
     I2C_HandleTypeDef* i2c_handle;
